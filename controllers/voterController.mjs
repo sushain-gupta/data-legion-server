@@ -594,82 +594,11 @@ export const getVoterSurveyAnalytics = asyncErrorHandler(
 				pollingStation = assigedStations;
 			}
 
-			// if (req.user.role === "voterAdmin" && pollingStation.length === 0) {
-			// 	pollingStation =  || [];
-			// }
-
-			// let groupFields = [
-			// 	"village",
-			// 	"boothNumber",
-			// 	"gender",
-			// 	"ageGroup",
-			// 	"caste",
-			// 	"subCaste",
-			// 	"eduQualification",
-			// 	"occupation",
-			// 	"MLAperfomance",
-			// 	"whichCandidateWillWin",
-			// 	"whoWillWin",
-			// 	"whichPartyWillWin",
-			// 	"voted2019",
-			// 	"mandal",
-			// 	"isVoterLocal",
-			// ];
-
-			// let voterData = {};
-
 			const constituencyCode = req.user.constituencyCode;
 			const baseMatch = {
 				acNumber: constituencyCode,
 				...(pollingStation ? { pollingStation: { $in: pollingStation } } : {}),
 			};
-
-			const excelWiseAnalytics = await Voter.aggregate([
-				{
-					$match: {
-						acNumber: constituencyCode,
-						surveyTaken: true,
-					},
-				},
-				{
-					$facet: {
-						ageGroupAnalysis: [
-							{
-								$bucket: {
-									groupBy: "$age",
-									boundaries: [18, 31, 41, 51, 61, Infinity],
-									default: "Unknown",
-									output: {
-										count: { $sum: 1 },
-									},
-								},
-							},
-							{
-								$project: {
-									ageGroup: {
-										$arrayElemAt: [
-											["18-30", "31-40", "41-50", "51-60", "60+"],
-											{
-												$indexOfArray: [[18, 31, 41, 51, 61], "$_id"],
-											},
-										],
-									},
-									count: 1,
-								},
-							},
-						],
-						genderAnalysis: [
-							{
-								$group: {
-									_id: "$gender",
-									count: { $sum: 1 },
-								},
-							},
-						],
-						// Add more facets for other fields as needed
-					},
-				},
-			]);
 
 			const surveyWiseAnalytics = await Voter.aggregate([
 				{ $match: baseMatch },
