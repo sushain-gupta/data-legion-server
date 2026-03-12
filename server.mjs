@@ -13,6 +13,8 @@ import mongoose from "mongoose";
 dotenv.config();
 const app = express();
 
+app.get("/health", (req, res) => res.send("ok"));
+
 // Middleware to handle CORS
 app.use((req, res, next) => {
 	cors({
